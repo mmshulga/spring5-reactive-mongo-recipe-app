@@ -1,8 +1,9 @@
 package guru.springframework.services;
 
 import guru.springframework.domain.Recipe;
-import guru.springframework.repositories.RecipeRepository;
+import guru.springframework.repositories.reactive.RecipeReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,13 +16,11 @@ import java.io.IOException;
 @Slf4j
 @Service
 public class ImageServiceImpl implements ImageService {
+    private final RecipeReactiveRepository recipeReactiveRepository;
 
-
-    private final RecipeRepository recipeRepository;
-
-    public ImageServiceImpl( RecipeRepository recipeService) {
-
-        this.recipeRepository = recipeService;
+    @Autowired
+    public ImageServiceImpl(RecipeReactiveRepository recipeReactiveRepository) {
+        this.recipeReactiveRepository = recipeReactiveRepository;
     }
 
     @Override
@@ -29,7 +28,7 @@ public class ImageServiceImpl implements ImageService {
     public void saveImageFile(String recipeId, MultipartFile file) {
 
         try {
-            Recipe recipe = recipeRepository.findById(recipeId).get();
+            Recipe recipe = recipeReactiveRepository.findById(recipeId).blockOptional().get();
 
             Byte[] byteObjects = new Byte[file.getBytes().length];
 
@@ -41,7 +40,7 @@ public class ImageServiceImpl implements ImageService {
 
             recipe.setImage(byteObjects);
 
-            recipeRepository.save(recipe);
+            recipeReactiveRepository.save(recipe);
         } catch (IOException e) {
             //todo handle better
             log.error("Error occurred", e);
