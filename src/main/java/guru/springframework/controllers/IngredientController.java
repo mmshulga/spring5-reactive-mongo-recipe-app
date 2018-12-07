@@ -38,7 +38,7 @@ public class IngredientController {
         log.debug("Getting ingredient list for recipe id: " + recipeId);
 
         // use command object to avoid lazy load errors in Thymeleaf.
-        model.addAttribute("recipe", recipeService.findCommandById(recipeId).block());
+        model.addAttribute("recipe", recipeService.findCommandById(recipeId));
 
         return "recipe/ingredient/list";
     }
@@ -47,7 +47,7 @@ public class IngredientController {
     public String showRecipeIngredient(@PathVariable String recipeId,
                                        @PathVariable String id, Model model){
         model.addAttribute("ingredient",
-                ingredientService.findByRecipeIdAndIngredientId(recipeId, id).block());
+                ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
         return "recipe/ingredient/show";
     }
 
@@ -66,7 +66,7 @@ public class IngredientController {
         ingredientCommand.setUom(new UnitOfMeasureCommand());
 
         model.addAttribute("uomList",
-                unitOfMeasureService.listAllUoms().collect(Collectors.toList()).block());
+                unitOfMeasureService.listAllUoms().collect(Collectors.toList()));
 
         return "recipe/ingredient/ingredientform";
     }
@@ -75,10 +75,10 @@ public class IngredientController {
     public String updateRecipeIngredient(@PathVariable String recipeId,
                                          @PathVariable String id, Model model){
         model.addAttribute("ingredient",
-                ingredientService.findByRecipeIdAndIngredientId(recipeId, id).block());
+                ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
 
         model.addAttribute("uomList",
-                unitOfMeasureService.listAllUoms().collect(Collectors.toList()).block());
+                unitOfMeasureService.listAllUoms().collect(Collectors.toList()));
         return "recipe/ingredient/ingredientform";
     }
 
@@ -96,7 +96,7 @@ public class IngredientController {
                                    @PathVariable String id){
 
         log.debug("deleting ingredient id:" + id);
-        ingredientService.deleteById(recipeId, id);
+        ingredientService.deleteById(recipeId, id).block();
 
         return "redirect:/recipe/" + recipeId + "/ingredients";
     }
